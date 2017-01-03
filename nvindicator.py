@@ -61,7 +61,7 @@ class NvIndicator:
 			
 			# set the menu
 			menu.show_all()
-			gpu.set_menu(menu)
+			ind.set_menu(menu)
 			self.menus.append(menu)
 		
 	def clear(self):
