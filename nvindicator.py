@@ -93,10 +93,10 @@ class NvIndicator:
 		# end with another loop
 		GLib.timeout_add_seconds(1, self.run_loop)
 		
-	def run_nvidia_settings(self):
+	def run_nvidia_settings(self, widget):
 		run(["nvidia-settings"])
 		
-	def update_gpu(self, idx, gpu)
+	def update_gpu(self, idx, gpu):
 		self.gpus[idx].set_label(
 			"GPU: {}% MEM: {}%".format(
 				str(gpu.utilization[0].gpu_util[0]).split()[0],
