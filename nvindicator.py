@@ -46,10 +46,16 @@ class NvIndicator:
 			ind.set_status(appindicator.IndicatorStatus.ACTIVE)
 			self.gpus.append(ind)
 			menu = Gtk.Menu()
-			
+
+			# gpu name
+			item = Gtk.MenuItem()
+			item.set_label(str(gpu.product_name[0]))
+			item.connect("activate", self.do_nothing)
+			menu.append(item)
+
 			# add an nvidia-settings menu item
 			item = Gtk.MenuItem()
-			item.set_label("Nvidia Settings")
+			item.set_label("NVIDIA Settings")
 			item.connect("activate", self.run_nvidia_settings)
 			menu.append(item)
 			
@@ -67,6 +73,9 @@ class NvIndicator:
 	def clear(self):
 		for gpu in self.gpus:
 			gpu.set_status(appindicator.IndicatorStatus.ACTIVE)
+
+	def do_nothing(self, widget):
+		pass
 		
 	def main(self):
 		self.run_loop()
