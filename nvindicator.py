@@ -6,7 +6,7 @@ __author__ = "Jeff Channell"
 __copyright__ = "Copyright 2017, Jeff Channell"
 __credits__ = ["Jeff Channell"]
 __license__ = "GPL"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __maintainer__ = "Jeff Channell"
 __email__ = "me@jeffchannell.com"
 __status__ = "Prototype"
@@ -29,6 +29,9 @@ class NvIndicator:
 			universal_newlines=True
 		)
 		
+		# track menus
+		self.menus = []
+		
 		# track gpus
 		self.gpus = []
 		xml = self.read_nvidia()
@@ -42,15 +45,13 @@ class NvIndicator:
 			)
 			ind.set_status(appindicator.IndicatorStatus.ACTIVE)
 			self.gpus.append(ind)
-		
-		# add the menu
-		self.add_menus()
-		
-	def add_menus(self):
-		self.menus = []
-		
-		for gpu in self.gpus:
 			menu = Gtk.Menu()
+			
+			# add an nvidia-settings menu item
+			item = Gtk.MenuItem()
+			item.set_label("Nvidia Settings")
+			item.connect("activate", self.run_nvidia_settings)
+			menu.append(item)
 			
 			# add a quit menu item
 			item = Gtk.MenuItem()
@@ -87,16 +88,22 @@ class NvIndicator:
 		xml = self.read_nvidia()
 		idx = 0
 		for gpu in xml.gpu:
-			self.gpus[idx].set_label(
-				"GPU: {}% MEM: {}%".format(
-					str(gpu.utilization[0].gpu_util[0]).split()[0],
-					str(gpu.utilization[0].memory_util[0]).split()[0]
-				),
-				"NvInidicatorUsage"
-			)
+			self.update_gpu(idx, gpu)
 			idx = idx + 1
 		# end with another loop
 		GLib.timeout_add_seconds(1, self.run_loop)
+		
+	def run_nvidia_settings(self):
+		run(["nvidia-settings"])
+		
+	def update_gpu(self, idx, gpu)
+		self.gpus[idx].set_label(
+			"GPU: {}% MEM: {}%".format(
+				str(gpu.utilization[0].gpu_util[0]).split()[0],
+				str(gpu.utilization[0].memory_util[0]).split()[0]
+			),
+			"NvInidicatorUsage"
+		)
 
 def main():
 	# allow app to be killed using ctrl+c
