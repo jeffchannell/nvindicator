@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""nvindicator.py: An nvidia GPU indicator applet"""
+"""nvindicator.py: An NVIDIA GPU indicator applet"""
 
 __author__ = "Jeff Channell"
 __copyright__ = "Copyright 2017, Jeff Channell"
@@ -33,6 +33,9 @@ class NvIndicator:
 			stdout=subprocess.PIPE, 
 			universal_newlines=True
 		)
+		
+		# about window init
+		self.about = None
 		
 		# track menus
 		self.menus = []
@@ -130,6 +133,12 @@ class NvIndicator:
 			item = Gtk.SeparatorMenuItem()
 			menu.append(item)
 			
+			# about me
+			item = Gtk.MenuItem()
+			item.set_label("About")
+			item.connect("activate", self.show_about)
+			menu.append(item)
+			
 			# add a quit menu item
 			item = Gtk.MenuItem()
 			item.set_label("Quit")
@@ -142,10 +151,32 @@ class NvIndicator:
 			self.menus.append(items)
 			
 			self.gpus.append(ind)
+			
+	def add_about_window_contents(self):
+		text = Gtk.Label()
+		text.set_markup(
+			"<b>About NvIndicator</b>\n\n{}\n\n"
+			"An NVIDIA GPU indicator applet\n\n"
+			"<a href=\"https://github.com/jeffchannell/nvindicator\">"
+			"https://github.com/jeffchannell/nvindicator</a>\n\n"
+			"<small>"
+			"© 2017 Jeff Channell\n\n"
+			"This program comes with absolutely no warranty.\n"
+			"See the GNU General Public License, version 3 or later for details."
+			"</small>".format(__version__)
+		)
+		text.set_line_wrap(True)
+		text.set_justify(Gtk.Justification.CENTER)
+		
+		self.about.add(text)
 		
 	def clear(self):
 		for gpu in self.gpus:
 			gpu.set_status(appindicator.IndicatorStatus.ACTIVE)
+			
+	def destroy_about(self, widget, something):
+		self.about = None
+		return False
 
 	def do_nothing(self, widget):
 		pass
@@ -177,6 +208,19 @@ class NvIndicator:
 		
 	def run_nvidia_settings(self, widget):
 		run(["nvidia-settings"])
+		
+	def show_about(self, widget):
+		if None == self.about:
+			self.about = Gtk.Window()
+			self.about.set_title("About NvInidicator")
+			self.about.set_keep_above(True)
+			self.about.connect("delete-event", self.destroy_about)
+			self.add_about_window_contents()
+			
+		self.about.set_position(Gtk.WindowPosition.CENTER)
+		self.about.set_size_request(400, 200)
+		self.about.show_all()
+			
 		
 	def update_gpu(self, idx, gpu):
 		self.gpus[idx].set_label(
